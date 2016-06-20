@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">City Wheather</string>
+    <string name="city_name_1">Nizhny Novgorod</string>
+    <string name="city_name_2">Moscow</string>
+</resources>
