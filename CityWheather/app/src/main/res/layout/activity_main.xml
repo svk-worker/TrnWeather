@@ -16,26 +16,61 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true">
 
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="192dp"
+            android:id="@+id/lvCities"
+            android:choiceMode="singleChoice"
+            android:drawSelectorOnTop="true"
+            android:layoutMode="clipBounds"
+            android:transitionGroup="false" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="To Request ->"
+            android:id="@+id/bRequest" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="To Get ->"
+            android:id="@+id/bGet" />
+
+    </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Received data:"
+            android:layout_gravity="left|center_vertical"
+            android:enabled="false"
+            android:gravity="center" />
+
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1">
+            android:layout_height="wrap_content">
 
-            <Button
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/city_name_1"
-                android:id="@+id/bCity1"
-                android:layout_weight="1"
+                android:text="City name:"
                 android:layout_gravity="left|center_vertical"
+                android:layout_weight="1"
+                android:enabled="false"
                 android:gravity="center" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="unknown"
-                android:id="@+id/tvCity1"
+                android:id="@+id/tvCityName"
                 android:layout_gravity="left|center_vertical"
                 android:layout_weight="1"
                 android:enabled="false"
@@ -46,29 +81,29 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1">
+            android:layout_height="wrap_content">
 
-            <Button
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/city_name_2"
-                android:id="@+id/bCity2"
-                android:layout_weight="1"
+                android:text="Temperature:"
                 android:layout_gravity="left|center_vertical"
+                android:layout_weight="1"
+                android:enabled="false"
                 android:gravity="center" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="unknown"
-                android:id="@+id/tvCity1"
+                android:id="@+id/tvTemper"
                 android:layout_gravity="left|center_vertical"
                 android:layout_weight="1"
                 android:enabled="false"
                 android:gravity="center" />
 
         </LinearLayout>
+
 
     </LinearLayout>
 </RelativeLayout>

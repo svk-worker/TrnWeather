@@ -63,8 +63,9 @@ public class CWFetcher {
     }
 
 
-    public String fetchItems() {
-        String items = "";
+    public CWData fetchItems() {
+
+        CWData items = null;
 
         try {
             String url = Uri.parse(ENDPOINT).buildUpon()
@@ -74,21 +75,35 @@ public class CWFetcher {
 
             Log.i(TAG, "url: " + url);
 
-            String xmlString = getUrl(url);
-            Log.i(TAG, "Received xml: " + xmlString);
+            String jsonString = getUrl(url);
+            Log.i(TAG, "Received xml: " + jsonString);
 
-            items = xmlString;
+//            items = xmlString;
+
+            /*
+            items:
+            {"coord":{"lon":37.62,"lat":55.75},
+            "weather":[{"id":801,"main":"Clouds","description":"few clouds","icon":"02d"}],
+            "base":"cmc stations",
+            "main":{"temp":301.12,"pressure":1023,"humidity":48,"temp_min":300.37,"temp_max":302.04},
+            "wind":{"speed":6.68,"deg":180,"gust":6.68},
+            "clouds":{"all":20},"dt":1466509585,
+            "sys":{"type":3,"id":37754,"message":0.0033,"country":"RU","sunrise":1466469886,"sunset":1466533090},
+            "id":524901,"name":"Moscow","cod":200}
+             */
 
             CWData CWResult = new CWData();
 
             try {
-                JSONObject jsonObject = new JSONObject(items);
+                JSONObject jsonObject = new JSONObject(jsonString);
                 CWResult.mCod = jsonObject.getInt("cod");
                 CWResult.mName = jsonObject.getString("name");
 //                CWResult.mDescription = jsonObject.getString("weather.description");
 //                CWResult.mTemp = jsonObject.getDouble("temp");
                 JSONObject joTemp = jsonObject.getJSONObject("main");
                 CWResult.mTemp = joTemp.getDouble("temp");
+
+                items = CWResult;
 
                 Log.e(TAG, "CWResult: " + CWResult.mCod + CWResult.mName + CWResult.mTemp + jsonObject.has("main") + jsonObject.has("main.temp"));
 

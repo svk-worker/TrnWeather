@@ -6,12 +6,10 @@ import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class LocalService extends Service {
 
@@ -50,6 +48,37 @@ public class LocalService extends Service {
     }
 
     /** method for clients */
+
+    public void requestCWData() {
+
+        mt = new MyTask();
+        mt.execute();
+
+        return;
+    }
+
+    public CWData getCWData() {
+
+        CWData result = null;
+
+        if (mt == null) return result;
+
+        try {
+            Log.d(LOG_TAG, "Try to get result");
+//            result = mt.get(10, TimeUnit.SECONDS);
+            result = mt.get();
+            Log.d(LOG_TAG, "get returns " + result);
+//            Toast.makeText(this, "get returns " + result, Toast.LENGTH_LONG).show();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+
     public int getRandomNumber() {
 //        return mGenerator.nextInt(100);
 
@@ -82,7 +111,7 @@ public class LocalService extends Service {
     }
 
 
-    class MyTask extends AsyncTask<Void, Void, Integer> {
+    class MyTask extends AsyncTask<Void, Void, CWData> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -92,21 +121,22 @@ public class LocalService extends Service {
 
 
         @Override
-        protected Integer doInBackground(Void... params) {
+        protected CWData doInBackground(Void... params) {
 
-            String res = new CWFetcher().fetchItems();
+            CWData res = new CWFetcher().fetchItems();
             Log.d(LOG_TAG, "Real result = " + res);
-
+/*
             try {
                 TimeUnit.SECONDS.sleep(1);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            return 100500;
+*/
+            return res;
         }
 
         @Override
-        protected void onPostExecute(Integer result) {
+        protected void onPostExecute(CWData result) {
             super.onPostExecute(result);
 //            tvInfo.setText("End. Result = " + result);
             Log.d(LOG_TAG, "End. Result = " + result);

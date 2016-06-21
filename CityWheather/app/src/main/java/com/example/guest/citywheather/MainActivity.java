@@ -8,13 +8,20 @@ import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button mCity1Button;
-    private Button mCity2Button;
+    String[] mCityNames = { "Nizhny Novgorod", "Moscow", "Vladimir", "Kostroma", "Kiev", "Mozdok" };
+
+    private Button mBtnRequest;
+    private Button mBtnGet;
+    private TextView mTVCityName;
+    private TextView mTVTemper;
 
     LocalService mService;
     boolean mBound = false;
@@ -25,8 +32,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mCity1Button = (Button)findViewById(R.id.bCity1);
-        mCity1Button.setOnClickListener(new View.OnClickListener() {
+
+        // находим список
+        ListView lvMain = (ListView) findViewById(R.id.lvCities);
+
+        // создаем адаптер
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, mCityNames);
+
+        // присваиваем адаптер списку
+        lvMain.setAdapter(adapter);
+
+        mTVCityName = (TextView)findViewById(R.id.tvCityName);
+        mTVTemper = (TextView)findViewById(R.id.tvTemper);
+
+
+        mBtnRequest = (Button)findViewById(R.id.bRequest);
+        mBtnRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 /*
@@ -39,22 +61,38 @@ public class MainActivity extends AppCompatActivity {
                     // Call a method from the LocalService.
                     // However, if this call were something that might hang, then this request should
                     // occur in a separate thread to avoid slowing down the activity performance.
-                    int num = mService.getRandomNumber();
-                    Toast.makeText(MainActivity.this, "number: " + num, Toast.LENGTH_SHORT).show();
+//                    int num = mService.getRandomNumber();
+//                    Toast.makeText(MainActivity.this, "number: " + num, Toast.LENGTH_SHORT).show();
+                    mService.requestCWData();
+                    mTVCityName.setText("");
+                    mTVTemper.setText("");
+                    Toast.makeText(MainActivity.this, "Request CWData...", Toast.LENGTH_SHORT).show();
                 }
 
             }
         });
 
-        mCity2Button = (Button)findViewById(R.id.bCity2);
-        mCity2Button.setOnClickListener(new View.OnClickListener() {
+        mBtnGet = (Button)findViewById(R.id.bGet);
+        mBtnGet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                // TO DO!
-                Toast.makeText(MainActivity.this,
-                        R.string.city_name_2,
-                        Toast.LENGTH_SHORT).show();
+                if (mBound) {
+                    // Call a method from the LocalService.
+                    // However, if this call were something that might hang, then this request should
+                    // occur in a separate thread to avoid slowing down the activity performance.
+//                    int num = mService.getRandomNumber();
+//                    Toast.makeText(MainActivity.this, "number: " + num, Toast.LENGTH_SHORT).show();
+                    CWData gotRes = mService.getCWData();
+                    if (gotRes != null) {
+                        mTVCityName.setText(gotRes.mName);
+                        mTVTemper.setText(Double.toString(gotRes.mTemp));
+                    }
+                    Toast.makeText(MainActivity.this, "Get CWData...", Toast.LENGTH_SHORT).show();
+
+                }
+
+
 
             }
         });
