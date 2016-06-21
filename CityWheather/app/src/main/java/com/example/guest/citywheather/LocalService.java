@@ -2,17 +2,27 @@ package com.example.guest.citywheather;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
+import android.widget.Toast;
 
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class LocalService extends Service {
+
+    private final String LOG_TAG = "myLogs";
 
     // Binder given to clients
     private final IBinder mBinder = new LocalBinder();
     // Random number generator
     private final Random mGenerator = new Random();
+
+    MyTask mt;
 
 /*
     public LocalService() {
@@ -41,8 +51,69 @@ public class LocalService extends Service {
 
     /** method for clients */
     public int getRandomNumber() {
-        return mGenerator.nextInt(100);
+//        return mGenerator.nextInt(100);
+
+        mt = new MyTask();
+        mt.execute();
+
+        int result = -1;
+
+/*
+
+//        if (mt == null) return;
+//        int result = -1;
+
+        try {
+            Log.d(LOG_TAG, "Try to get result");
+            result = mt.get(10, TimeUnit.SECONDS);
+            Log.d(LOG_TAG, "get returns " + result);
+//            Toast.makeText(this, "get returns " + result, Toast.LENGTH_LONG).show();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (TimeoutException e) {
+            Log.d(LOG_TAG, "get timeout, result = " + result);
+            e.printStackTrace();
+        }
+*/
+        return result;
+
     }
+
+
+    class MyTask extends AsyncTask<Void, Void, Integer> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+//            tvInfo.setText("Begin");
+            Log.d(LOG_TAG, "Begin");
+        }
+
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+
+            String res = new CWFetcher().fetchItems();
+            Log.d(LOG_TAG, "Real result = " + res);
+
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return 100500;
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            super.onPostExecute(result);
+//            tvInfo.setText("End. Result = " + result);
+            Log.d(LOG_TAG, "End. Result = " + result);
+
+        }
+    }
+
 }
 
 
