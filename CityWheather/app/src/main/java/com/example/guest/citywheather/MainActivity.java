@@ -21,7 +21,14 @@ public class MainActivity extends AppCompatActivity {
     private Button mBtnRequest;
     private Button mBtnGet;
     private TextView mTVCityName;
+
+    private TextView mTVCountry;
+    private TextView mTVWeGen;
+    private TextView mTVWeDesc;
     private TextView mTVTemper;
+    private TextView mTVWePressure;
+    private TextView mTVWeHumidity;
+    private TextView mTVWeWindSpeed;
 
     LocalService mService;
     boolean mBound = false;
@@ -44,8 +51,13 @@ public class MainActivity extends AppCompatActivity {
         lvMain.setAdapter(adapter);
 
         mTVCityName = (TextView)findViewById(R.id.tvCityName);
+        mTVCountry = (TextView)findViewById(R.id.tvCountry);
+        mTVWeGen = (TextView)findViewById(R.id.tvWeGen);
+        mTVWeDesc = (TextView)findViewById(R.id.tvWeDesc);
         mTVTemper = (TextView)findViewById(R.id.tvTemper);
-
+        mTVWePressure = (TextView)findViewById(R.id.tvPressure);
+        mTVWeHumidity = (TextView)findViewById(R.id.tvHumidity);
+        mTVWeWindSpeed = (TextView)findViewById(R.id.tvWeWindSpeed);
 
         mBtnRequest = (Button)findViewById(R.id.bRequest);
         mBtnRequest.setOnClickListener(new View.OnClickListener() {
@@ -64,8 +76,16 @@ public class MainActivity extends AppCompatActivity {
 //                    int num = mService.getRandomNumber();
 //                    Toast.makeText(MainActivity.this, "number: " + num, Toast.LENGTH_SHORT).show();
                     mService.requestCWData();
+
                     mTVCityName.setText("");
+                    mTVCountry.setText("");
+                    mTVWeGen.setText("");
+                    mTVWeDesc.setText("");
                     mTVTemper.setText("");
+                    mTVWePressure.setText("");
+                    mTVWeHumidity.setText("");
+                    mTVWeWindSpeed.setText("");
+
                     Toast.makeText(MainActivity.this, "Request CWData...", Toast.LENGTH_SHORT).show();
                 }
 
@@ -86,7 +106,13 @@ public class MainActivity extends AppCompatActivity {
                     CWData gotRes = mService.getCWData();
                     if (gotRes != null) {
                         mTVCityName.setText(gotRes.mName);
-                        mTVTemper.setText(Double.toString(gotRes.mTemp));
+                        mTVCountry.setText(gotRes.mCountry);
+                        mTVWeGen.setText(gotRes.mWeGen);
+                        mTVWeDesc.setText(gotRes.mWeDesc);
+                        mTVTemper.setText(Double.toString(gotRes.mWeTemp));
+                        mTVWePressure.setText(Integer.toString(gotRes.mWePressure));
+                        mTVWeHumidity.setText(Integer.toString(gotRes.mWeHumidity));
+                        mTVWeWindSpeed.setText(Double.toString(gotRes.mWeWindSpeed));
                     }
                     Toast.makeText(MainActivity.this, "Get CWData...", Toast.LENGTH_SHORT).show();
 

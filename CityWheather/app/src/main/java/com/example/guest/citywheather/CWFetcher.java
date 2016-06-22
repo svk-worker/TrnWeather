@@ -3,6 +3,7 @@ package com.example.guest.citywheather;
 import android.net.Uri;
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
@@ -32,7 +33,7 @@ public class CWFetcher {
     private static final String API_KEY = "a18c87f9856cddffb1f2c079f18eb202";
     private static final String PARAM_CITY = "q";
     private static final String CITY = "Moscow";
-
+    private static final int COD_OK = 200;      // JSON object with CW data was received successfully
 
 
 
@@ -97,15 +98,36 @@ public class CWFetcher {
             try {
                 JSONObject jsonObject = new JSONObject(jsonString);
                 CWResult.mCod = jsonObject.getInt("cod");
-                CWResult.mName = jsonObject.getString("name");
-//                CWResult.mDescription = jsonObject.getString("weather.description");
-//                CWResult.mTemp = jsonObject.getDouble("temp");
-                JSONObject joTemp = jsonObject.getJSONObject("main");
-                CWResult.mTemp = joTemp.getDouble("temp");
+                if (CWResult.mCod == COD_OK) {
+                    CWResult.mName = jsonObject.getString("name");
+                    if (jsonObject.has("main")) {
+                        JSONObject joTemp = jsonObject.getJSONObject("main");
+                        CWResult.mWeTemp = joTemp.getDouble("temp") - 273;
+                        CWResult.mWeTemp = (int)CWResult.mWeTemp;
+                        CWResult.mWePressure = joTemp.getInt("pressure");
+                        CWResult.mWeHumidity = joTemp.getInt("humidity");
+                    }
+                    if (jsonObject.has("wind")) {
+                        JSONObject joTemp = jsonObject.getJSONObject("wind");
+                        CWResult.mWeWindSpeed = joTemp.getDouble("speed");
+                    }
+                    if (jsonObject.has("sys")) {
+                        JSONObject joTemp = jsonObject.getJSONObject("sys");
+                        CWResult.mCountry = joTemp.getString("country");
+                    }
+                    if (jsonObject.has("weather")) {
+                        JSONArray jaTemp = jsonObject.getJSONArray("weather");
+                        JSONObject joTemp = jaTemp.getJSONObject(0);
+                        CWResult.mWeGen = joTemp.getString("main");
+                        CWResult.mWeDesc = joTemp.getString("description");
+                    }
+
+                }
+
 
                 items = CWResult;
 
-                Log.e(TAG, "CWResult: " + CWResult.mCod + CWResult.mName + CWResult.mTemp + jsonObject.has("main") + jsonObject.has("main.temp"));
+                Log.e(TAG, "CWResult: " + CWResult.mCod + CWResult.mName + CWResult.mWeTemp + jsonObject.has("main") + jsonObject.has("main.temp"));
 
             } catch (JSONException e) {
                 Log.e(TAG, "Failed to json: ", e);
