@@ -21,6 +21,17 @@ import java.util.ArrayList;
 /**
  * The class receives weather data for indicated city in JSON format
  * and parses the data into special structure to be used by other classes
+ *
+ Example of json result:
+ {"coord":{"lon":37.62,"lat":55.75},
+ "weather":[{"id":801,"main":"Clouds","description":"few clouds","icon":"02d"}],
+ "base":"cmc stations",
+ "main":{"temp":301.12,"pressure":1023,"humidity":48,"temp_min":300.37,"temp_max":302.04},
+ "wind":{"speed":6.68,"deg":180,"gust":6.68},
+ "clouds":{"all":20},"dt":1466509585,
+ "sys":{"type":3,"id":37754,"message":0.0033,"country":"RU","sunrise":1466469886,"sunset":1466533090},
+ "id":524901,"name":"Moscow","cod":200}
+ *
  */
 
 public class CWFetcher {
@@ -33,8 +44,6 @@ public class CWFetcher {
     private static final String API_KEY = "a18c87f9856cddffb1f2c079f18eb202";
     private static final String PARAM_CITY = "q";
     private static final int COD_OK = 200;      // JSON object with CW data was received successfully
-
-
 
 
     byte[] getUrlBytes(String urlSpec) throws IOException {
@@ -58,6 +67,7 @@ public class CWFetcher {
         }
     }
 
+
     public String getUrl(String urlSpec) throws IOException {
         return new String(getUrlBytes(urlSpec));
     }
@@ -72,31 +82,18 @@ public class CWFetcher {
                     .appendQueryParameter(PARAM_CITY, cityName)
                     .appendQueryParameter(PARAM_API_KEY, API_KEY)
                     .build().toString();
-/*
-            String url = Uri.parse(ENDPOINT).buildUpon()
-                    .appendQueryParameter(PARAM_CITY, CITY)
-                    .appendQueryParameter(PARAM_API_KEY, API_KEY)
-                    .build().toString();
-*/
+
             Log.i(TAG, "url: " + url);
 
             String jsonString = getUrl(url);
-            Log.i(TAG, "Received xml: " + jsonString);
+
+            Log.i(TAG, "Received json string: " + jsonString);
+
+            parseItems(items, jsonString);
 
 //            items = xmlString;
 
-            /*
-            items:
-            {"coord":{"lon":37.62,"lat":55.75},
-            "weather":[{"id":801,"main":"Clouds","description":"few clouds","icon":"02d"}],
-            "base":"cmc stations",
-            "main":{"temp":301.12,"pressure":1023,"humidity":48,"temp_min":300.37,"temp_max":302.04},
-            "wind":{"speed":6.68,"deg":180,"gust":6.68},
-            "clouds":{"all":20},"dt":1466509585,
-            "sys":{"type":3,"id":37754,"message":0.0033,"country":"RU","sunrise":1466469886,"sunset":1466533090},
-            "id":524901,"name":"Moscow","cod":200}
-             */
-
+/*
             CWData CWResult = new CWData();
 
             try {
@@ -132,11 +129,9 @@ public class CWFetcher {
                 items = CWResult;
 
                 Log.e(TAG, "CWResult: " + CWResult.mCod + CWResult.mName + CWResult.mWeTemp + jsonObject.has("main") + jsonObject.has("main.temp"));
+*/
 
-            } catch (JSONException e) {
-                Log.e(TAG, "Failed to json: ", e);
 
-            }
 
 
 /*
@@ -148,11 +143,47 @@ public class CWFetcher {
 
         } catch (IOException ioe) {
             Log.e(TAG, "Failed to fetch items", ioe);
-//        } catch (XmlPullParserException xppe) {
-//            Log.e(TAG, "Failed to parse items", xppe);
+        } catch (JSONException e) {
+            Log.e(TAG, "Failed to json: ", e);
         }
 
         return items;
+    }
+
+
+    void parseItems(CWData items, String jsonString)
+            throws JSONException {
+
+        CWData CWResult = new CWData();
+        JSONObject jsonObject = new JSONObject(jsonString);
+        CWResult.mCod = jsonObject.getInt("cod");
+        if (CWResult.mCod == COD_OK) {
+            CWResult.mName = jsonObject.getString("name");
+            if (jsonObject.has("main")) {
+                JSONObject joTemp = jsonObject.getJSONObject("main");
+                CWResult.mWeTemp = (int) (joTemp.getDouble("temp") - 273);
+                CWResult.mWePressure = joTemp.getInt("pressure");
+                CWResult.mWeHumidity = joTemp.getInt("humidity");
+            }
+            if (jsonObject.has("wind")) {
+                JSONObject joTemp = jsonObject.getJSONObject("wind");
+                CWResult.mWeWindSpeed = joTemp.getDouble("speed");
+            }
+            if (jsonObject.has("sys")) {
+                JSONObject joTemp = jsonObject.getJSONObject("sys");
+                CWResult.mCountry = joTemp.getString("country");
+            }
+            if (jsonObject.has("weather")) {
+                JSONArray jaTemp = jsonObject.getJSONArray("weather");
+                JSONObject joTemp = jaTemp.getJSONObject(0);
+                CWResult.mWeGen = joTemp.getString("main");
+                CWResult.mWeDesc = joTemp.getString("description");
+            }
+            items = CWResult;
+
+        }
+
+        Log.e(TAG, "CWResult.cod: " + CWResult.mCod + "   CWResult: " + CWResult);
     }
 
 
