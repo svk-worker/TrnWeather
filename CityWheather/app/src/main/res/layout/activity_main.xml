@@ -21,9 +21,10 @@
             android:layout_height="192dp"
             android:id="@+id/lvCities"
             android:choiceMode="singleChoice"
-            android:drawSelectorOnTop="true"
+            android:drawSelectorOnTop="false"
             android:layoutMode="clipBounds"
-            android:transitionGroup="false" />
+            android:transitionGroup="false"
+            android:listSelector="@android:color/darker_gray" />
 
     <LinearLayout
         android:orientation="horizontal"

@@ -7,7 +7,9 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -16,7 +18,11 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final String LOG_TAG = "myLogs";
+
+
     String[] mCityNames = { "Nizhny Novgorod", "Moscow", "Vladimir", "Kostroma", "Kiev", "Mozdok" };
+    private String mSelectedCity = null;
 
     private Button mBtnRequest;
     private Button mBtnGet;
@@ -41,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // находим список
-        ListView lvMain = (ListView) findViewById(R.id.lvCities);
+        final ListView lvMain = (ListView) findViewById(R.id.lvCities);
 
         // создаем адаптер
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
@@ -49,6 +55,16 @@ public class MainActivity extends AppCompatActivity {
 
         // присваиваем адаптер списку
         lvMain.setAdapter(adapter);
+
+        lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                Log.d(LOG_TAG, "itemClick: position = " + position + ", id = "
+                        + id);
+                mSelectedCity = lvMain.getAdapter().getItem(position).toString();
+            }
+        });
+
 
         mTVCityName = (TextView)findViewById(R.id.tvCityName);
         mTVCountry = (TextView)findViewById(R.id.tvCountry);
@@ -59,34 +75,32 @@ public class MainActivity extends AppCompatActivity {
         mTVWeHumidity = (TextView)findViewById(R.id.tvHumidity);
         mTVWeWindSpeed = (TextView)findViewById(R.id.tvWeWindSpeed);
 
+
+
         mBtnRequest = (Button)findViewById(R.id.bRequest);
         mBtnRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-/*
-                // TO DO!
-                Toast.makeText(MainActivity.this,
-                        R.string.city_name_1,
-                        Toast.LENGTH_SHORT).show();
-*/
                 if (mBound) {
-                    // Call a method from the LocalService.
-                    // However, if this call were something that might hang, then this request should
-                    // occur in a separate thread to avoid slowing down the activity performance.
-//                    int num = mService.getRandomNumber();
-//                    Toast.makeText(MainActivity.this, "number: " + num, Toast.LENGTH_SHORT).show();
-                    mService.requestCWData();
+                    if (mSelectedCity == null) {
+                        Toast.makeText(MainActivity.this, "Please select concrete city to get weather!",
+                                Toast.LENGTH_SHORT).show();
+                    } else {
+                        mTVCityName.setText("");
+                        mTVCountry.setText("");
+                        mTVWeGen.setText("");
+                        mTVWeDesc.setText("");
+                        mTVTemper.setText("");
+                        mTVWePressure.setText("");
+                        mTVWeHumidity.setText("");
+                        mTVWeWindSpeed.setText("");
 
-                    mTVCityName.setText("");
-                    mTVCountry.setText("");
-                    mTVWeGen.setText("");
-                    mTVWeDesc.setText("");
-                    mTVTemper.setText("");
-                    mTVWePressure.setText("");
-                    mTVWeHumidity.setText("");
-                    mTVWeWindSpeed.setText("");
+                        mService.requestCWData(mSelectedCity);
 
-                    Toast.makeText(MainActivity.this, "Request CWData...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Request CWData...", Toast.LENGTH_SHORT).show();
+
+                    }
+
                 }
 
             }

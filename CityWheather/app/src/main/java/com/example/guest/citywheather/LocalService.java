@@ -49,10 +49,10 @@ public class LocalService extends Service {
 
     /** method for clients */
 
-    public void requestCWData() {
+    public void requestCWData(String cn) {
 
         mt = new MyTask();
-        mt.execute();
+        mt.execute(cn);
 
         return;
     }
@@ -83,7 +83,7 @@ public class LocalService extends Service {
 //        return mGenerator.nextInt(100);
 
         mt = new MyTask();
-        mt.execute();
+        mt.execute("");
 
         int result = -1;
 
@@ -111,7 +111,7 @@ public class LocalService extends Service {
     }
 
 
-    class MyTask extends AsyncTask<Void, Void, CWData> {
+    class MyTask extends AsyncTask<String, Void, CWData> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -121,9 +121,9 @@ public class LocalService extends Service {
 
 
         @Override
-        protected CWData doInBackground(Void... params) {
+        protected CWData doInBackground(String... params) {
 
-            CWData res = new CWFetcher().fetchItems();
+            CWData res = new CWFetcher().fetchItems(params[0]);
             Log.d(LOG_TAG, "Real result = " + res);
 /*
             try {

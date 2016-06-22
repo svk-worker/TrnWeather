@@ -64,16 +64,21 @@ public class CWFetcher {
     }
 
 
-    public CWData fetchItems() {
+    public CWData fetchItems(String cityName) {
 
         CWData items = null;
 
         try {
             String url = Uri.parse(ENDPOINT).buildUpon()
+                    .appendQueryParameter(PARAM_CITY, cityName)
+                    .appendQueryParameter(PARAM_API_KEY, API_KEY)
+                    .build().toString();
+/*
+            String url = Uri.parse(ENDPOINT).buildUpon()
                     .appendQueryParameter(PARAM_CITY, CITY)
                     .appendQueryParameter(PARAM_API_KEY, API_KEY)
                     .build().toString();
-
+*/
             Log.i(TAG, "url: " + url);
 
             String jsonString = getUrl(url);
