@@ -32,7 +32,6 @@ public class CWFetcher {
     private static final String PARAM_API_KEY = "appid";
     private static final String API_KEY = "a18c87f9856cddffb1f2c079f18eb202";
     private static final String PARAM_CITY = "q";
-    private static final String CITY = "Moscow";
     private static final int COD_OK = 200;      // JSON object with CW data was received successfully
 
 

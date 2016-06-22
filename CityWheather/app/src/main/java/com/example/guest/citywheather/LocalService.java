@@ -20,6 +20,8 @@ public class LocalService extends Service {
     // Random number generator
     private final Random mGenerator = new Random();
 
+    private boolean isTaskInProgress = false;
+
     MyTask mt;
 
 /*
@@ -61,7 +63,15 @@ public class LocalService extends Service {
 
         CWData result = null;
 
-        if (mt == null) return result;
+        if (mt == null) {
+            Log.d(LOG_TAG, "No active task (mt == null)");
+            return result;
+        }
+
+        if (isTaskInProgress) {
+            Log.d(LOG_TAG, "Task is still in progress, no results yet...");
+            return result;
+        }
 
         try {
             Log.d(LOG_TAG, "Try to get result");
@@ -123,6 +133,8 @@ public class LocalService extends Service {
         @Override
         protected CWData doInBackground(String... params) {
 
+            isTaskInProgress = true;
+
             CWData res = new CWFetcher().fetchItems(params[0]);
             Log.d(LOG_TAG, "Real result = " + res);
 /*
@@ -132,6 +144,8 @@ public class LocalService extends Service {
                 e.printStackTrace();
             }
 */
+            isTaskInProgress = false;
+
             return res;
         }
 
