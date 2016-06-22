@@ -16,7 +16,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ServiceCallbacks {
 
     private final String LOG_TAG = "myLogs";
 
@@ -152,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         // Unbind from the service
         if (mBound) {
+            mService.setCallbacks(null); // unregister
             unbindService(mConnection);
             mBound = false;
         }
@@ -167,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
             LocalService.LocalBinder binder = (LocalService.LocalBinder) service;
             mService = binder.getService();
             mBound = true;
+            mService.setCallbacks(MainActivity.this); // register
         }
 
         @Override
@@ -175,5 +177,26 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    /* Defined by ServiceCallbacks interface */
+    @Override
+    public void updateCWData(CWData gotRes) {
+
+        Log.d(LOG_TAG, "callback updateCWData: gotRes = " + gotRes);
+
+        if (mBound) {
+            if (gotRes != null) {
+                mTVCityName.setText(gotRes.mName);
+                mTVCountry.setText(gotRes.mCountry);
+                mTVWeGen.setText(gotRes.mWeGen);
+                mTVWeDesc.setText(gotRes.mWeDesc);
+                mTVTemper.setText(Double.toString(gotRes.mWeTemp));
+                mTVWePressure.setText(Integer.toString(gotRes.mWePressure));
+                mTVWeHumidity.setText(Integer.toString(gotRes.mWeHumidity));
+                mTVWeWindSpeed.setText(Double.toString(gotRes.mWeWindSpeed));
+            }
+//            Toast.makeText(MainActivity.this, "Get CWData...", Toast.LENGTH_SHORT).show();
+        }
+
+    }
 
 }

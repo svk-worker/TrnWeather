@@ -17,6 +17,9 @@ public class LocalService extends Service {
 
     // Binder given to clients
     private final IBinder mBinder = new LocalBinder();
+    // Registered callbacks
+    private ServiceCallbacks serviceCallbacks;
+
     // Random number generator
     private final Random mGenerator = new Random();
 
@@ -28,6 +31,11 @@ public class LocalService extends Service {
     public LocalService() {
     }
 */
+
+    public void setCallbacks(ServiceCallbacks callbacks) {
+        serviceCallbacks = callbacks;
+    }
+
 
     /**
      * Class used for the client Binder.  Because we know this service always
@@ -154,6 +162,10 @@ public class LocalService extends Service {
             super.onPostExecute(result);
 //            tvInfo.setText("End. Result = " + result);
             Log.d(LOG_TAG, "End. Result = " + result);
+
+            if (serviceCallbacks != null) {
+                serviceCallbacks.updateCWData(result);
+            }
 
         }
     }
