@@ -37,12 +37,6 @@
             android:text="To Request ->"
             android:id="@+id/bRequest" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="To Get ->"
-            android:id="@+id/bGet" />
-
     </LinearLayout>
 
         <TextView

@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 public class LocalService extends Service {
 
-    private final String LOG_TAG = "myLogs";
+    private final String LOG_TAG = "LocalService";
 
     // Binder given to clients
     private final IBinder mBinder = new LocalBinder();
@@ -21,19 +21,13 @@ public class LocalService extends Service {
     // Registered callbacks
     private ServiceCallbacks serviceCallbacks;
 
-    // Random number generator
-    private final Random mGenerator = new Random();
-
-    private boolean isTaskInProgress = false;
-
+    // task to get CW data in background mode
     MyTask mt;
 
-/*
-    public LocalService() {
-    }
-*/
 
     public void setCallbacks(ServiceCallbacks callbacks) {
+        Log.i(LOG_TAG, "START: setCallbacks()..." );
+
         serviceCallbacks = callbacks;
     }
 
@@ -44,13 +38,17 @@ public class LocalService extends Service {
      */
     public class LocalBinder extends Binder {
         LocalService getService() {
+            Log.i(LOG_TAG, "START: getService()..." );
+
             // Return this instance of LocalService so clients can call public methods
             return LocalService.this;
         }
     }
 
+
     @Override
     public IBinder onBind(Intent intent) {
+        Log.i(LOG_TAG, "START: onBind()..." );
 
         // TODO: Return the communication channel to the service.
         //throw new UnsupportedOperationException("Not yet implemented");
@@ -58,94 +56,32 @@ public class LocalService extends Service {
         return mBinder;
     }
 
-    /** method for clients */
+
+    /** methods for clients */
 
     public void requestCWData(String cn) {
+        Log.i(LOG_TAG, "START: requestCWData()..." );
 
         mt = new MyTask();
         mt.execute(cn);
-
         return;
-    }
-
-    public CWData getCWData() {
-
-        CWData result = null;
-
-        if (mt == null) {
-            Log.d(LOG_TAG, "No active task (mt == null)");
-            return result;
-        }
-
-        if (isTaskInProgress) {
-            Log.d(LOG_TAG, "Task is still in progress, no results yet...");
-            return result;
-        }
-
-        try {
-            Log.d(LOG_TAG, "Try to get result");
-//            result = mt.get(10, TimeUnit.SECONDS);
-            result = mt.get();
-            Log.d(LOG_TAG, "get returns " + result);
-//            Toast.makeText(this, "get returns " + result, Toast.LENGTH_LONG).show();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        return result;
-    }
-
-
-    public int getRandomNumber() {
-//        return mGenerator.nextInt(100);
-
-        mt = new MyTask();
-        mt.execute("");
-
-        int result = -1;
-
-/*
-
-//        if (mt == null) return;
-//        int result = -1;
-
-        try {
-            Log.d(LOG_TAG, "Try to get result");
-            result = mt.get(10, TimeUnit.SECONDS);
-            Log.d(LOG_TAG, "get returns " + result);
-//            Toast.makeText(this, "get returns " + result, Toast.LENGTH_LONG).show();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (TimeoutException e) {
-            Log.d(LOG_TAG, "get timeout, result = " + result);
-            e.printStackTrace();
-        }
-*/
-        return result;
-
     }
 
 
     class MyTask extends AsyncTask<String, Void, CWData> {
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-//            tvInfo.setText("Begin");
-            Log.d(LOG_TAG, "Begin");
-        }
 
+            Log.i(LOG_TAG, "START: onPreExecute()..." );
+        }
 
         @Override
         protected CWData doInBackground(String... params) {
-
-            isTaskInProgress = true;
+            Log.i(LOG_TAG, "START: doInBackground()..." + "   Input param = " + params[0]);
 
             CWData res = new CWFetcher().fetchItems(params[0]);
-            Log.d(LOG_TAG, "Real result = " + res);
 /*
             try {
                 TimeUnit.SECONDS.sleep(1);
@@ -153,16 +89,13 @@ public class LocalService extends Service {
                 e.printStackTrace();
             }
 */
-            isTaskInProgress = false;
-
             return res;
         }
 
         @Override
         protected void onPostExecute(CWData result) {
             super.onPostExecute(result);
-//            tvInfo.setText("End. Result = " + result);
-            Log.d(LOG_TAG, "End. Result = " + result);
+            Log.i(LOG_TAG, "START: onPostExecute()..." + "   Final result (CW data) = " + result);
 
             if (serviceCallbacks != null) {
                 serviceCallbacks.updateCWData(result);
