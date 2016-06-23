@@ -75,6 +75,8 @@ public class CWFetcher {
 
     public CWData fetchItems(String cityName) {
 
+        Log.i(TAG, "START: fetchItems()...");
+
         CWData items = new CWData();
 
         try {

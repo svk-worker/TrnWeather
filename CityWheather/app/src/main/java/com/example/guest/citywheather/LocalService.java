@@ -17,7 +17,7 @@ public class LocalService extends Service {
 
     // Binder given to clients
     private final IBinder mBinder = new LocalBinder();
-    
+
     // Registered callbacks
     private ServiceCallbacks serviceCallbacks;
 
