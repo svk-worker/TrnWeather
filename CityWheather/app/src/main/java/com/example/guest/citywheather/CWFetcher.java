@@ -82,71 +82,15 @@ public class CWFetcher {
                     .appendQueryParameter(PARAM_CITY, cityName)
                     .appendQueryParameter(PARAM_API_KEY, API_KEY)
                     .build().toString();
-
             Log.i(TAG, "url: " + url);
 
             String jsonString = getUrl(url);
-
             Log.i(TAG, "Received json string: " + jsonString);
 
-            Log.i(TAG, "Before parseItems - items: " + items);
             parseItems(items, jsonString);
-            Log.i(TAG, "After parseItems - items: " + items);
             if (items.mCod != COD_OK) {
                 items = null;
             }
-
-
-//            items = xmlString;
-
-/*
-            CWData CWResult = new CWData();
-
-            try {
-                JSONObject jsonObject = new JSONObject(jsonString);
-                CWResult.mCod = jsonObject.getInt("cod");
-                if (CWResult.mCod == COD_OK) {
-                    CWResult.mName = jsonObject.getString("name");
-                    if (jsonObject.has("main")) {
-                        JSONObject joTemp = jsonObject.getJSONObject("main");
-                        CWResult.mWeTemp = joTemp.getDouble("temp") - 273;
-                        CWResult.mWeTemp = (int)CWResult.mWeTemp;
-                        CWResult.mWePressure = joTemp.getInt("pressure");
-                        CWResult.mWeHumidity = joTemp.getInt("humidity");
-                    }
-                    if (jsonObject.has("wind")) {
-                        JSONObject joTemp = jsonObject.getJSONObject("wind");
-                        CWResult.mWeWindSpeed = joTemp.getDouble("speed");
-                    }
-                    if (jsonObject.has("sys")) {
-                        JSONObject joTemp = jsonObject.getJSONObject("sys");
-                        CWResult.mCountry = joTemp.getString("country");
-                    }
-                    if (jsonObject.has("weather")) {
-                        JSONArray jaTemp = jsonObject.getJSONArray("weather");
-                        JSONObject joTemp = jaTemp.getJSONObject(0);
-                        CWResult.mWeGen = joTemp.getString("main");
-                        CWResult.mWeDesc = joTemp.getString("description");
-                    }
-
-                }
-
-
-                items = CWResult;
-
-                Log.e(TAG, "CWResult: " + CWResult.mCod + CWResult.mName + CWResult.mWeTemp + jsonObject.has("main") + jsonObject.has("main.temp"));
-*/
-
-
-
-
-/*
-            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-            XmlPullParser parser = factory.newPullParser();
-            parser.setInput(new StringReader(xmlString));
-            parseItems(items, parser);
-*/
-
         } catch (IOException ioe) {
             Log.e(TAG, "Failed to fetch items", ioe);
             items = null;
@@ -162,7 +106,6 @@ public class CWFetcher {
     void parseItems(CWData CWResult, String jsonString)
             throws JSONException {
 
-//        CWData CWResult = new CWData();
         JSONObject jsonObject = new JSONObject(jsonString);
         CWResult.mCod = jsonObject.getInt("cod");
         if (CWResult.mCod == COD_OK) {
@@ -187,64 +130,10 @@ public class CWFetcher {
                 CWResult.mWeGen = joTemp.getString("main");
                 CWResult.mWeDesc = joTemp.getString("description");
             }
-//            items = CWResult;
-
         }
 
         Log.e(TAG, "CWResult.cod: " + CWResult.mCod + "   CWResult: " + CWResult);
     }
 
-
-
-/*
-    public ArrayList<GalleryItem> fetchItems() {
-        ArrayList<GalleryItem> items = new ArrayList<GalleryItem>();
-
-        try {
-            String url = Uri.parse(ENDPOINT).buildUpon()
-                    .appendQueryParameter("key", API_KEY)
-                    .appendQueryParameter(PARAM_FORMAT, EXTRA_FORMAT_XML)
-                    .appendQueryParameter(PARAM_PAGE_SIZE, EXTRA_PAGE_SIZE)
-                    .appendQueryParameter(PARAM_PAGE_NUM, EXTRA_PAGE_NUM)
-                    .appendQueryParameter("method", METHOD_GET_READ)
-                    .build().toString();
-
-            Log.i(TAG, "url: " + url);
-
-
-            String xmlString = getUrl(url);
-            Log.i(TAG, "Received xml: " + xmlString);
-
-            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-            XmlPullParser parser = factory.newPullParser();
-            parser.setInput(new StringReader(xmlString));
-            parseItems(items, parser);
-
-        } catch (IOException ioe) {
-            Log.e(TAG, "Failed to fetch items", ioe);
-        } catch (XmlPullParserException xppe) {
-            Log.e(TAG, "Failed to parse items", xppe);
-        }
-
-        return items;
-    }
-*/
-
-/*
-    void parseItems(ArrayList<GalleryItem> items, XmlPullParser parser)
-            throws XmlPullParserException, IOException {
-        int eventType = parser.next();
-        while (eventType != XmlPullParser.END_DOCUMENT) {
-//            Log.e(TAG, "eventType parser.getName() ->" + eventType + ", " + parser.getName());
-//            Log.e(TAG, "parser.getText() ->" + parser.getText());
-            GalleryItem item = new GalleryItem();
-            item.setCaption(parser.getText());
-            item.setEngCaption(parser.getText());
-            items.add(item);
-
-            eventType = parser.next();
-        }
-    }
-*/
 
 }
