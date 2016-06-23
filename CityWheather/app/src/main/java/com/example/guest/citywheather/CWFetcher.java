@@ -75,7 +75,7 @@ public class CWFetcher {
 
     public CWData fetchItems(String cityName) {
 
-        CWData items = null;
+        CWData items = new CWData();
 
         try {
             String url = Uri.parse(ENDPOINT).buildUpon()
@@ -89,7 +89,13 @@ public class CWFetcher {
 
             Log.i(TAG, "Received json string: " + jsonString);
 
+            Log.i(TAG, "Before parseItems - items: " + items);
             parseItems(items, jsonString);
+            Log.i(TAG, "After parseItems - items: " + items);
+            if (items.mCod != COD_OK) {
+                items = null;
+            }
+
 
 //            items = xmlString;
 
@@ -143,18 +149,20 @@ public class CWFetcher {
 
         } catch (IOException ioe) {
             Log.e(TAG, "Failed to fetch items", ioe);
+            items = null;
         } catch (JSONException e) {
             Log.e(TAG, "Failed to json: ", e);
+            items = null;
         }
 
         return items;
     }
 
 
-    void parseItems(CWData items, String jsonString)
+    void parseItems(CWData CWResult, String jsonString)
             throws JSONException {
 
-        CWData CWResult = new CWData();
+//        CWData CWResult = new CWData();
         JSONObject jsonObject = new JSONObject(jsonString);
         CWResult.mCod = jsonObject.getInt("cod");
         if (CWResult.mCod == COD_OK) {
@@ -179,7 +187,7 @@ public class CWFetcher {
                 CWResult.mWeGen = joTemp.getString("main");
                 CWResult.mWeDesc = joTemp.getString("description");
             }
-            items = CWResult;
+//            items = CWResult;
 
         }
 
