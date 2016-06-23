@@ -20,8 +20,15 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
 
     private final String LOG_TAG = "MainActivity";
 
+    // for save in Bundle
+    private static final String KEY_SELECTED_CITY = "SelectedCity";
+    private static final String KEY_CW_DATA = "CWData";
+
     String[] mCityNames = { "Nizhny Novgorod", "Moscow", "Vladimir", "Kostroma", "Kiev", "Mozdok" };
+
     private String mSelectedCity = null;
+    private CWData mCWDataItem = null;
+
 
     private Button mBtnRequest;
     private TextView mTVCityName;
@@ -41,10 +48,24 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
 
 
     @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        Log.i(LOG_TAG, "START: onSaveInstanceState()...");
+        savedInstanceState.putString(KEY_SELECTED_CITY, mSelectedCity);
+        savedInstanceState.putSerializable(KEY_CW_DATA, mCWDataItem);
+    }
+
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.i(LOG_TAG, "START: onCreate()...");
+
+        if (savedInstanceState != null) {
+            mSelectedCity = savedInstanceState.getString(KEY_SELECTED_CITY);
+            mCWDataItem = (CWData)savedInstanceState.getSerializable(KEY_CW_DATA);
+        }
 
         // find list
         final ListView lvMain = (ListView) findViewById(R.id.lvCities);
@@ -74,14 +95,8 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
                                 Toast.LENGTH_SHORT).show();
                     } else {
                         // clear weather data from previous request
-                        mTVCityName.setText("");
-                        mTVCountry.setText("");
-                        mTVWeGen.setText("");
-                        mTVWeDesc.setText("");
-                        mTVTemper.setText("");
-                        mTVWePressure.setText("");
-                        mTVWeHumidity.setText("");
-                        mTVWeWindSpeed.setText("");
+                        mCWDataItem = null;
+                        updateCWDataUI();
 
                         // Disable request button and request data from Service
                         mBtnRequest.setEnabled(false);
@@ -99,8 +114,35 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         mTVWePressure = (TextView)findViewById(R.id.tvPressure);
         mTVWeHumidity = (TextView)findViewById(R.id.tvHumidity);
         mTVWeWindSpeed = (TextView)findViewById(R.id.tvWeWindSpeed);
+
+        updateCWDataUI();
     }
 
+
+    protected void updateCWDataUI() {
+        Log.i(LOG_TAG, "START: updateCWDataUI()...");
+
+        if (mCWDataItem == null) {
+            // clear weather data
+            mTVCityName.setText("");
+            mTVCountry.setText("");
+            mTVWeGen.setText("");
+            mTVWeDesc.setText("");
+            mTVTemper.setText("");
+            mTVWePressure.setText("");
+            mTVWeHumidity.setText("");
+            mTVWeWindSpeed.setText("");
+        } else {
+            mTVCityName.setText(mCWDataItem.mName);
+            mTVCountry.setText(mCWDataItem.mCountry);
+            mTVWeGen.setText(mCWDataItem.mWeGen);
+            mTVWeDesc.setText(mCWDataItem.mWeDesc);
+            mTVTemper.setText(Double.toString(mCWDataItem.mWeTemp));
+            mTVWePressure.setText(Integer.toString(mCWDataItem.mWePressure));
+            mTVWeHumidity.setText(Integer.toString(mCWDataItem.mWeHumidity));
+            mTVWeWindSpeed.setText(Double.toString(mCWDataItem.mWeWindSpeed));
+        }
+    }
 
     @Override
     protected void onStart() {
@@ -158,16 +200,9 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
 
         // Enable request button and refresh interface per received data from Service
         mBtnRequest.setEnabled(true);
-        if (gotRes != null) {
-            mTVCityName.setText(gotRes.mName);
-            mTVCountry.setText(gotRes.mCountry);
-            mTVWeGen.setText(gotRes.mWeGen);
-            mTVWeDesc.setText(gotRes.mWeDesc);
-            mTVTemper.setText(Double.toString(gotRes.mWeTemp));
-            mTVWePressure.setText(Integer.toString(gotRes.mWePressure));
-            mTVWeHumidity.setText(Integer.toString(gotRes.mWeHumidity));
-            mTVWeWindSpeed.setText(Double.toString(gotRes.mWeWindSpeed));
-        } else {
+        mCWDataItem = gotRes;
+        updateCWDataUI();
+        if (gotRes == null) {
             Toast.makeText(MainActivity.this, "Failed to receive weather data from service!",
                     Toast.LENGTH_SHORT).show();
         }

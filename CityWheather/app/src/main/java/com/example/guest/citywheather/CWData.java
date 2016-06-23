@@ -1,10 +1,12 @@
 package com.example.guest.citywheather;
 
+import java.io.Serializable;
+
 /**
  * Class to store City weather data
  */
 
-public class CWData {
+public class CWData implements Serializable {
     int mCod = 0;                       // "cod":200
     String mName = null;                // "name":"Moscow"
     String mCountry = null;             // "sys"."country":"RU"
