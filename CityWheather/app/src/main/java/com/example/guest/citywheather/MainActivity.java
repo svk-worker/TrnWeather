@@ -23,11 +23,13 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     // for save in Bundle
     private static final String KEY_SELECTED_CITY = "SelectedCity";
     private static final String KEY_CW_DATA = "CWData";
+    private static final String KEY_IS_REQ_INPROGRESS = "IsReqInprogress";
 
     String[] mCityNames = { "Nizhny Novgorod", "Moscow", "Vladimir", "Kostroma", "Kiev", "Mozdok" };
 
     private String mSelectedCity = null;
     private CWData mCWDataItem = null;
+    private boolean mIsReqInprogress = false;     // true if request to get CW data is in progress
 
 
     private Button mBtnRequest;
@@ -53,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         Log.i(LOG_TAG, "START: onSaveInstanceState()...");
         savedInstanceState.putString(KEY_SELECTED_CITY, mSelectedCity);
         savedInstanceState.putSerializable(KEY_CW_DATA, mCWDataItem);
+        savedInstanceState.putBoolean(KEY_IS_REQ_INPROGRESS, mIsReqInprogress);
     }
 
 
@@ -65,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         if (savedInstanceState != null) {
             mSelectedCity = savedInstanceState.getString(KEY_SELECTED_CITY);
             mCWDataItem = (CWData)savedInstanceState.getSerializable(KEY_CW_DATA);
+            mIsReqInprogress = savedInstanceState.getBoolean(KEY_IS_REQ_INPROGRESS);
         }
 
         // find list
@@ -99,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
                         updateCWDataUI();
 
                         // Disable request button and request data from Service
+                        mIsReqInprogress = true;
                         mBtnRequest.setEnabled(false);
                         mService.requestCWData(mSelectedCity);
                     }
@@ -180,8 +185,17 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             LocalService.LocalBinder binder = (LocalService.LocalBinder) service;
             mService = binder.getService();
+
+            Log.i(LOG_TAG, "onServiceConnected = " + mService);
+
             mBound = true;
             mService.setCallbacks(MainActivity.this); // register
+            // resend request if previous one was not completed
+            if (mIsReqInprogress) {
+                Log.i(LOG_TAG, "Resend request for city = " + mSelectedCity);
+                mBtnRequest.setEnabled(false);
+                mService.requestCWData(mSelectedCity);
+            }
         }
 
         @Override
@@ -199,6 +213,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         Log.i(LOG_TAG, "START: updateCWData()..." + "   gotRes = " + gotRes);
 
         // Enable request button and refresh interface per received data from Service
+        mIsReqInprogress = false;
         mBtnRequest.setEnabled(true);
         mCWDataItem = gotRes;
         updateCWDataUI();

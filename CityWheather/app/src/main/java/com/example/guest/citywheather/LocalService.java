@@ -25,10 +25,28 @@ public class LocalService extends Service {
     MyTask mt;
 
 
+    @Override
+    public void onCreate() {
+        Log.i(LOG_TAG, "START: onCreate()..." );
+
+        return;
+    }
+
+
+    @Override
+    public void onDestroy() {
+        Log.i(LOG_TAG, "START: onDestroy()..." );
+
+        return;
+    }
+
+
     public void setCallbacks(ServiceCallbacks callbacks) {
         Log.i(LOG_TAG, "START: setCallbacks()..." );
 
         serviceCallbacks = callbacks;
+
+        Log.i(LOG_TAG, "serviceCallbacks = " + callbacks);
     }
 
 
@@ -54,6 +72,19 @@ public class LocalService extends Service {
         //throw new UnsupportedOperationException("Not yet implemented");
 
         return mBinder;
+    }
+
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Log.i(LOG_TAG, "START: onUnbind()..." );
+
+        // to cancel async task if disconnect happens
+        if (mt != null) {
+            mt.cancel(true);
+        }
+
+        return false;
     }
 
 
@@ -84,7 +115,7 @@ public class LocalService extends Service {
             CWData res = new CWFetcher().fetchItems(params[0]);
 /*
             try {
-                TimeUnit.SECONDS.sleep(1);
+                TimeUnit.SECONDS.sleep(2);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

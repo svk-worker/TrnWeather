@@ -22,22 +22,20 @@
             android:id="@+id/lvCities"
             android:choiceMode="singleChoice"
             android:drawSelectorOnTop="false"
-            android:layoutMode="clipBounds"
-            android:transitionGroup="false"
             android:listSelector="@android:color/darker_gray" />
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="To Request ->"
-            android:id="@+id/bRequest" />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="To Request ->"
+                android:id="@+id/bRequest" />
 
-    </LinearLayout>
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
