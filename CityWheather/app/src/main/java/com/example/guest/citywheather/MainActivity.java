@@ -8,7 +8,9 @@ import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -22,18 +24,23 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
 
     // for save in Bundle
     private static final String KEY_SELECTED_CITY = "SelectedCity";
+    private static final String KEY_SELECTED_CITY_POS = "SelectedCityPos";
     private static final String KEY_CW_DATA = "CWData";
     private static final String KEY_IS_REQ_INPROGRESS = "IsReqInprogress";
 
-    String[] mCityNames = { "Nizhny Novgorod", "Moscow", "Vladimir", "Kostroma", "Kiev", "Mozdok" };
 
-    private String mSelectedCity = null;
-    private CWData mCWDataItem = null;
+    String[] mCityNames = { "Nizhny Novgorod", "Moscow", "Vladimir", "Kostroma", "Kiev", "Mozdok",
+                            "Astrahan", "Minsk" };
+
+    private String mSelectedCity = null;        // name of selected city
+    private int mSelectedCityPos = -1;          // index of selected city
+    private CWData mCWDataItem = null;          // weather data of selected city
     private boolean mIsReqInprogress = false;     // true if request to get CW data is in progress
-
 
     private Button mBtnRequest;
     private TextView mTVCityName;
+    private ListView lvMain = null;
+    private MyAdapter adapter;
 
     // weather interface
     private TextView mTVCountry;
@@ -54,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         super.onSaveInstanceState(savedInstanceState);
         Log.i(LOG_TAG, "START: onSaveInstanceState()...");
         savedInstanceState.putString(KEY_SELECTED_CITY, mSelectedCity);
+        savedInstanceState.putInt(KEY_SELECTED_CITY_POS, mSelectedCityPos);
         savedInstanceState.putSerializable(KEY_CW_DATA, mCWDataItem);
         savedInstanceState.putBoolean(KEY_IS_REQ_INPROGRESS, mIsReqInprogress);
     }
@@ -67,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
 
         if (savedInstanceState != null) {
             mSelectedCity = savedInstanceState.getString(KEY_SELECTED_CITY);
+            mSelectedCityPos = savedInstanceState.getInt(KEY_SELECTED_CITY_POS);
             mCWDataItem = (CWData)savedInstanceState.getSerializable(KEY_CW_DATA);
             mIsReqInprogress = savedInstanceState.getBoolean(KEY_IS_REQ_INPROGRESS);
         }
@@ -75,8 +84,10 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         final ListView lvMain = (ListView) findViewById(R.id.lvCities);
 
         // create adapter
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, mCityNames);
+//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+//                android.R.layout.simple_list_item_1, mCityNames);
+        adapter = new MyAdapter(this, android.R.layout.simple_list_item_1, mCityNames,
+                                mSelectedCityPos);
 
         // set adapter to list
         lvMain.setAdapter(adapter);
@@ -85,6 +96,8 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 mSelectedCity = lvMain.getAdapter().getItem(position).toString();
+                mSelectedCityPos = position;
+                adapter.setSelectedRow(mSelectedCityPos);
                 Log.d(LOG_TAG, "itemClick: position = " + position + ",  city = " + mSelectedCity);
             }
         });
@@ -170,6 +183,39 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
             mService.setCallbacks(null); // unregister
             unbindService(mConnection);
             mBound = false;
+        }
+    }
+
+
+    private class MyAdapter extends ArrayAdapter<String> {
+        final int resId;
+        int selectedRow;
+        int selectedColor;
+
+        public MyAdapter(Context context, int resId, String[] data, int selectedRow) {
+            super(context, resId, data);
+            this.resId = resId;
+            this.selectedRow = selectedRow;
+            selectedColor = getResources().getColor(android.R.color.darker_gray);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            String string = getItem(position);
+
+            if (convertView == null) {
+                convertView = LayoutInflater.from(getContext()).inflate(resId, null);
+            }
+            TextView textView = (TextView) convertView;
+            textView.setText(string);
+            textView.setBackgroundColor(position == selectedRow ? selectedColor : 0x00000000);
+            return convertView;
+        }
+
+        public void setSelectedRow(int row)
+        {
+            selectedRow = row;
+            notifyDataSetInvalidated();
         }
     }
 
