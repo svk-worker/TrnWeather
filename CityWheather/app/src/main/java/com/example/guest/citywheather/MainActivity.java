@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     private Button mBtnRequest;
     private TextView mTVCityName;
     private ListView lvMain = null;
-    private MyAdapter adapter;
+    private CityAdapter mAdapter;
 
     // weather interface
     private TextView mTVCountry;
@@ -83,21 +83,21 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         // find list
         final ListView lvMain = (ListView) findViewById(R.id.lvCities);
 
-        // create adapter
-//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+        // create mAdapter
+//        ArrayAdapter<String> mAdapter = new ArrayAdapter<String>(this,
 //                android.R.layout.simple_list_item_1, mCityNames);
-        adapter = new MyAdapter(this, android.R.layout.simple_list_item_1, mCityNames,
+        mAdapter = new CityAdapter(this, android.R.layout.simple_list_item_1, mCityNames,
                                 mSelectedCityPos);
 
-        // set adapter to list
-        lvMain.setAdapter(adapter);
+        // set mAdapter to list
+        lvMain.setAdapter(mAdapter);
 
         lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 mSelectedCity = lvMain.getAdapter().getItem(position).toString();
                 mSelectedCityPos = position;
-                adapter.setSelectedRow(mSelectedCityPos);
+                mAdapter.setSelectedRow(mSelectedCityPos);
                 Log.d(LOG_TAG, "itemClick: position = " + position + ",  city = " + mSelectedCity);
             }
         });
@@ -187,12 +187,12 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     }
 
 
-    private class MyAdapter extends ArrayAdapter<String> {
+    private class CityAdapter extends ArrayAdapter<String> {
         final int resId;
         int selectedRow;
-        int selectedColor;
+        int selectedColor, usualColor = 0x00000000;
 
-        public MyAdapter(Context context, int resId, String[] data, int selectedRow) {
+        public CityAdapter(Context context, int resId, String[] data, int selectedRow) {
             super(context, resId, data);
             this.resId = resId;
             this.selectedRow = selectedRow;
@@ -208,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
             }
             TextView textView = (TextView) convertView;
             textView.setText(string);
-            textView.setBackgroundColor(position == selectedRow ? selectedColor : 0x00000000);
+            textView.setBackgroundColor(position == selectedRow ? selectedColor : usualColor);
             return convertView;
         }
 
